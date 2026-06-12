@@ -87,8 +87,58 @@ class _TaskPageState extends State<TaskPage> {
               itemCount: tasks.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(tasks[index]["title"]),
-                );
+  title: Text(tasks[index]["title"]),
+
+  trailing: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+
+      // ✏️ EDIT BUTTON
+      IconButton(
+        icon: Icon(Icons.edit),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              TextEditingController editController =
+                  TextEditingController(text: tasks[index]["title"]);
+
+              return AlertDialog(
+                title: Text("Update Task"),
+                content: TextField(
+                  controller: editController,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      await api.updateTask(
+                        tasks[index]["_id"],
+                        editController.text,
+                      );
+
+                      Navigator.pop(context);
+                      loadTasks();
+                    },
+                    child: Text("Update"),
+                  )
+                ],
+              );
+            },
+          );
+        },
+      ),
+
+      // 🗑️ DELETE BUTTON
+      IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: () async {
+          await api.deleteTask(tasks[index]["_id"]);
+          loadTasks();
+        },
+      ),
+    ],
+  ),
+);
               },
             ),
           ),
